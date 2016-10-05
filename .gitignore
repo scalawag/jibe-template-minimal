@@ -1,4 +1,5 @@
 .idea/
 .jibe/
+.vagrant/
 target/
 results/

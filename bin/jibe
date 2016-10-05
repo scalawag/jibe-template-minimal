@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# TODO The idea is to eventually move this script into the jibe/ project proper and distribute it along with a launcher.
+
+declare -r script_name="jibe"
+declare -r script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+declare sbt_log_level="warn"
+declare verbose=false
+
+text_bold=`tput bold`
+text_normal=`tput sgr0`
+
+echoerr () {
+  echo 1>&2 "$@"
+}
+
+vlog () {
+  [[ "$verbose" = true ]] && echoerr "$@"
+}
+
+function print_usage {
+  cat >&2 <<EOM
+Usage: $script_name <command> [options] [arguments]
+
+  Commands:
+    ${text_bold}run [jibescript]    Execute a jibe script${text_normal}
+      Will attempt to execute the jibe scala script specified in the ${text_bold}jibescript${text_normal} argument, which
+      must be in a file named ${text_bold}jibescript${text_normal}.scala in the project's root directory.
+      ${tex_bold}jibescript${text_normal} defaults to ${text_bold}default${text_normal} if not specified.
+EOM
+}
+
+function find_sbt_script() {
+  local sbt_script=$(type -p sbt)
+  if [[ ! -x "$sbt_script" ]]; then
+    echoerr "Unable to find sbt script."
+    exit 1
+  fi
+  echo "$sbt_script"
+}
+declare sbt_script=$(find_sbt_script)
+
+function run() {
+  local jibescript="$1"
+  if [[ -z "$jibescript" ]];then
+    jibescript="default"
+  fi
+  vlog "jibescript: $jibescript"
+  "$sbt_script" --"$sbt_log_level" -Dsbt.boot.directory=.jibe/sbt/boot update compile "set sourcesInBase := true" "set includeFilter in unmanagedSources := \"$jibescript.scala\"" "set scalacOptions ++= Seq(\"-Xscript\", \"$jibescript\")" compile "runMain $jibescript"
+}
+
+declare -r command="$1";shift
+
+while getopts ":v" opt; do
+  case "$opt" in
+    v)
+      verbose=true
+      sbt_log_level="info"
+      shift
+      ;;
+    \?)
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+vlog "command: $command"
+
+case "$command" in
+  run)
+    run "$@"
+    ;;
+  *)
+    print_usage
+    exit 1
+    ;;
+esac
+
+

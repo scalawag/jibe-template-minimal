@@ -1,0 +1,230 @@
+html {
+  font-family: sans-serif;
+}
+
+body {
+  min-width: 1000px;
+}
+
+div.mandate.success > div.summary {
+  background-color: #DFF2BF;
+}
+
+div.mandate.failure > div.summary {
+  background-color: #FFBABA;
+}
+
+div.mandate.running > div.summary {
+  background-color: #c3e6fc;
+}
+
+div.mandate.skipped > div.summary {
+  background-color: #FEEFB3;
+}
+
+div.mandate.waiting > div.summary {
+}
+
+div.row {
+  width: 100%;
+  clear: both;
+}
+
+div.box {
+//  border: solid black 1pt;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+
+div.collapser {
+  width: 1.5em;
+  float: left;
+  text-align: center;
+}
+
+div.phase-name {
+  color: white;
+  background-color: gray;
+}
+
+div.icon {
+  width: 1.5em;
+  float: left;
+  text-align: center;
+}
+
+div.indent {
+  margin-left: 1.5em;
+}
+
+div.time {
+  float: right;
+  text-align: right;
+  padding-right: 1em;
+}
+
+div.outcome {
+  float: right;
+  width: 20em;
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+div.description {
+  padding-left: .5em;
+  overflow: auto;
+}
+
+div.actions {
+  float: right;
+  padding-right: 1em;
+}
+
+div.right {
+  float: right;
+}
+
+div.mono {
+  padding-top: 0;
+}
+
+@keyframes spinup {
+  from { transform: rotate(90deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes spindown {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+div.spinup {
+  animation: spinup 200ms;
+}
+
+div.spindown {
+  animation: spindown 200ms;
+  animation-fill-mode: forwards;
+}
+
+div.actions i {
+  cursor: pointer;
+}
+
+div.actions i.toggle-on {
+  color: black;
+}
+
+div.actions i.toggle-off {
+  color: #dddddd;
+}
+
+div.mandate.hidden {
+  display: none;
+}
+
+div.summary {
+  margin-top: 1px;
+}
+
+
+div.log {
+  background: black;
+  overflow: auto;
+}
+
+div.log div.line, div.log div.line-number {
+  font-family: monospace;
+  white-space: pre;
+  padding-left: .5em;
+  padding-top: .1em;
+  padding-bottom: .1em;
+}
+
+div.log div.line-numbers {
+  float: left;
+}
+
+div.log div.collapser {
+  width: 1em;
+}
+
+div.log > div.line {
+  padding-left: 1.5em;
+}
+
+div.log div.dbg {
+  color: mediumorchid;
+}
+
+div.log div.inf {
+  color: #dddddd;
+}
+
+div.log div.wrn {
+  color: yellow;
+}
+
+div.log > div.err {
+  color: red;
+}
+
+div.log div.section {
+  padding: 0;
+}
+
+div.log div.command {
+  background-color: #4C2882;
+  color: lightgray;
+  padding: 0;
+}
+
+div.log div.command div.section.content {
+  background-color: lightgray;
+  color: #4C2882;
+}
+
+div.log div.command div.section.output {
+  background-color: black;
+  color: lightgray;
+}
+
+div.log div.command div.section.output div.line.ERR {
+  color: #ee6666;
+}
+
+div.log div.command div.start {
+}
+
+
+div.log div.command div.output.INF {
+  color: lightgray;
+  background-color: black;
+}
+
+
+div.log div.command div.exit {
+  background-color: #4C2882;
+  color: lightgray;
+}
+
+div.log div.collapser {
+//  width: inherit;
+//  padding: 0;
+}
+
+div.collapser-insert {
+  padding: 0;
+  overflow: auto;
+}
+
+div.log div.stack-trace {
+  background-color: #C41E2A;
+  color: lightgray;
+  padding: 0;
+}
+
+div.log div.stack-trace div.line.location {
+  background-color: lightgray;
+  color: #C41E2A;
+}

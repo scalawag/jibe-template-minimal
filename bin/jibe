@@ -31,15 +31,15 @@ Usage: $script_name <command> [options] [arguments]
 EOM
 }
 
-function find_sbt_script() {
-  local sbt_script=$(type -p sbt)
-  if [[ ! -x "$sbt_script" ]]; then
-    echoerr "Unable to find sbt script."
+function find_sbt_jar() {
+  local sbt_jar="$script_dir/sbt-launch.jar"
+  if [[ ! -x "$sbt_jar" ]]; then
+    echoerr "Unable to find sbt launcher jar. It should be in ./bin/ ... did you delete it?"
     exit 1
   fi
-  echo "$sbt_script"
+  echo "$sbt_jar"
 }
-declare sbt_script=$(find_sbt_script)
+declare sbt_jar=$(find_sbt_jar)
 
 function run() {
   local jibescript="$1"
@@ -47,7 +47,9 @@ function run() {
     jibescript="default"
   fi
   vlog "jibescript: $jibescript"
-  "$sbt_script" --"$sbt_log_level" -Dsbt.boot.directory=.jibe/sbt/boot update compile "set sourcesInBase := true" "set includeFilter in unmanagedSources := \"$jibescript.scala\"" "set scalacOptions ++= Seq(\"-Xscript\", \"$jibescript\")" compile "runMain $jibescript"
+  java -jar "$sbt_jar" --"$sbt_log_level" -Dsbt.boot.directory=.jibe/sbt/boot update compile \
+      "set sourcesInBase := true" "set includeFilter in unmanagedSources := \"$jibescript.scala\"" \
+      "set scalacOptions ++= Seq(\"-Xscript\", \"$jibescript\")" compile "runMain $jibescript"
 }
 
 declare -r command="$1";shift

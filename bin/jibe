@@ -4,7 +4,8 @@
 
 declare -r script_name="jibe"
 declare -r script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
+declare -r pid_file=".jibe/run/report_server.pid"
+declare -r log_dir=".jibe/logs"
 declare sbt_log_level="warn"
 declare verbose=false
 
@@ -28,6 +29,8 @@ Usage: $script_name <command> [options] [arguments]
       Will attempt to execute the jibe scala script specified in the ${text_bold}jibescript${text_normal} argument, which
       must be in a file named ${text_bold}jibescript${text_normal}.scala in the project's root directory.
       ${tex_bold}jibescript${text_normal} defaults to ${text_bold}default${text_normal} if not specified.
+    ${text_bold}start-report-server   Start the jibe report server in the background.{text_normal}
+    ${text_bold}stop-report-server   Stop the jibe report server if it is running.{text_normal}
 EOM
 }
 
@@ -52,6 +55,38 @@ function run() {
       "set scalacOptions ++= Seq(\"-Xscript\", \"$jibescript\")" compile "runMain $jibescript"
 }
 
+function start_report_server() {
+  if [[ -f "$pid_file" ]]; then
+    local pid=$(<"$pid_file")
+  fi
+  if [[ -n "$pid" ]]; then
+    echo "Existing pid file found at $pid_file. Is the report server already running?"
+    echo "If so, you can run 'jibe stop-report-server' to stop it."
+    exit 1
+  fi
+
+  vlog "Starting report server."
+  java -jar "$sbt_jar" --"$sbt_log_level" -Dsbt.boot.directory=.jibe/sbt/boot "runMain  org.scalawag.jibe.report.ReportServer" >> "$log_dir/report_server.log" 2>&1 &
+  echo $! > "$pid_file"
+}
+
+function stop_report_server() {
+  if [[ -f "$pid_file" ]]; then
+    local pid=$(<"$pid_file")
+  fi
+  if [[ -z "$pid" || ! "$pid" =~ ^[0-9]+$ ]]; then
+    echo "PID file $pid_file not found or does not contain a pid. Maybe the report server isn't running?"
+    exit 1
+  fi
+  vlog "Stopping report server."
+  kill "$pid"
+  vlog "Removing pid file $pid_file"
+  rm "$pid_file"
+}
+
+mkdir -p $(dirname "$pid_file")
+mkdir -p "$log_dir"
+
 declare -r command="$1";shift
 
 while getopts ":v" opt; do
@@ -73,6 +108,12 @@ vlog "command: $command"
 case "$command" in
   run)
     run "$@"
+    ;;
+  start-report-server)
+    start_report_server
+    ;;
+  stop-report-server)
+    stop_report_server
     ;;
   *)
     print_usage
